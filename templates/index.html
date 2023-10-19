@@ -2,9 +2,12 @@
 {% block body %}
   <h1>Upload new image(s)</h1>
   <form method="post" enctype="multipart/form-data" action="/upload">
-    <input type="file" name="file"
+    <input
+      type="file"
+      name="file"
       accept=".jpg, .jpeg, .png"
-      multiple>
+      multiple
+    >
     <button type="submit">Upload</button>
   </form>
 {% endblock %}

@@ -7,26 +7,34 @@
     <link href="/static/style.css" rel="stylesheet" type="text/css">
   </head>
   <body>
-    <ul class="navigation">
-      <li>
-        <a href="/image-class">Image classification</a>
-      </li>
-      <li>
-        <a href="/object-det">Object detection</a>
-      </li>
-      <li>
-        <a href="/image-coord">Image coordinates</a>
-      </li>
-    </ul>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class="flashes">
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-    {% block body %}{% endblock %}
+    <nav>
+      <ul class="navigation">
+        <li>
+          <a href="{{ url_for('image_class') }}">Image classification</a>
+        </li>
+        <li>
+          <a href="{{ url_for('object_det') }}">Object detection</a>
+        </li>
+        <li>
+          <a href="{{ url_for('image_coord') }}">Image coordinates</a>
+        </li>
+      </ul>
+    </nav>
+    <aside>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <ul class="flashes">
+          {% for category, message in messages %}
+            <li class="{{ category }}">
+              {{ message }}
+            </li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+    </aside>
+    <main>
+      {% block body %}{% endblock %}
+    </main>
   </body>
 </html>

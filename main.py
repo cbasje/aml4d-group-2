@@ -5,6 +5,7 @@ import object_detection
 import image_classification
 import image_coordinates
 
+# Inspired by: https://ask.replit.com/t/how-to-upload-files/14269/2
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(12).hex()
 
@@ -35,19 +36,19 @@ def index():
 @app.route('/image-class')
 def image_class():
   image_classification.main()
-  return render_template('index.html')
+  return redirect('/')
 
 
 @app.route('/object-det')
 def object_det():
   object_detection.main()
-  return render_template('index.html')
+  return redirect('/')
 
 
 @app.route('/image-coord')
 def image_coord():
   image_coordinates.main()
-  return render_template('index.html')
+  return redirect('/')
 
 
 @app.route('/upload', methods=['POST'])
@@ -55,20 +56,25 @@ def upload():
   # Check if the post request has the file part
   if 'file' not in request.files:
     flash('No file part')
-    return redirect(request.url)
-  file = request.files['file']
-  # If the user does not select a file, the browser submits an empty file without a filename
-  if file.filename == '':
-    flash('No selected file')
-    return redirect(request.url)
-  if file and allowed_file(file.filename):
-    # Save the uploaded file to the UPLOAD_FOLDER directory
-    file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
-    flash('File uploaded successfully')
     return redirect('/')
-  else:
-    flash('Invalid file type')
-    return redirect(request.url)
+
+  # Get the list of files
+  files = request.files.getlist("file")
+
+  # Iterate for each file in the files List, and Save them
+  for file in files:
+    # If the user does not select a file, the browser submits an empty file without a filename
+    if file.filename == '':
+      flash('No selected file')
+      return redirect('/')
+
+    if file and allowed_file(file.filename):
+      # Save the uploaded file to the UPLOAD_FOLDER directory
+      file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
+      flash(f"File {file.filename} uploaded successfully")
+    else:
+      flash(f"Invalid file type for {file.filename}")
+  return redirect('/')
 
 
 @app.route('/files/<name>')
