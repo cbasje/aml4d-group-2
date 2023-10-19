@@ -10,11 +10,19 @@ label_colors = {
     "bicycle": "orange",
     "car": "red",
     "truck": "red",
+    "train": "blue",
     "person": "purple"
 }
 
 
 def drawRectangles(file, data):
+  stats = {
+      "bicycle": 0,
+      "car": 0,
+      "truck": 0,
+      "train": 0,
+  }
+
   img = Image.open(os.path.join(INPUT_PATH, file))
   imgDraw = ImageDraw.Draw(img)
 
@@ -25,6 +33,9 @@ def drawRectangles(file, data):
 
   for i, obj in enumerate(data):
     print(i, obj['label'])
+
+    if obj['label'] in stats:
+      stats[obj['label']] += 1
 
     box = obj['box']
     color = label_colors.get(obj['label'], "black")
@@ -50,13 +61,19 @@ def drawRectangles(file, data):
   img.save(os.path.join(OUTPUT_PATH, file))
   print(f"'{file}' has {len(data)} objects")
 
+  return stats
+
 
 def main():
+  output = []
   files = readInputFolder()
   for file in files:
     fileData = readFile(file)
     jsonData = request(API_OBJECT_DETECTION_URL, fileData)
-    drawRectangles(file, jsonData)
+    stats = drawRectangles(file, jsonData)
+    output.append({"file": file, "stats": stats})
+
+  return output
 
 
 if __name__ == "__main__":

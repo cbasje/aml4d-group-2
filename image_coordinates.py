@@ -28,7 +28,7 @@ def getGeotagging(file):
   if not image_exif:
     # raise ValueError("No EXIF metadata found")
     print(f"'{file}' has no exif data.")
-    return pd.Series({'file': file, 'lat': None, 'lon': None})
+    return pd.Series({"file": file, "latitude": None, "longitude": None})
   else:
     for key, val in image_exif.items():
       if key in ExifTags.GPSTAGS:
@@ -54,6 +54,8 @@ def main():
   print(df)
 
   df.to_csv(os.path.join(OUTPUT_PATH, "image_coordinates.csv"))
+
+  return df.to_html()
 
 
 if __name__ == "__main__":

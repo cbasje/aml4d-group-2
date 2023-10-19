@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h1>Dectect objects in the images</h1>
+  <ul class="image-grid">
+    {% for d in data %}
+      <li>
+        <img src="/output-files/{{ d.file }}"/>
+        <h2>{{ d.file }}</h2>
+        <ul>
+          {% for k, v in d.stats.items() %}
+            <li>
+              {{ k }}: {{ v }}
+            </li>
+          {% endfor %}
+        </ul>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

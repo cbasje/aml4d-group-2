@@ -7,25 +7,12 @@
     <link href="/static/style.css" rel="stylesheet" type="text/css">
   </head>
   <body>
-    <nav>
-      <ul class="navigation">
-        <li>
-          <a href="{{ url_for('image_class') }}">Image classification</a>
-        </li>
-        <li>
-          <a href="{{ url_for('object_det') }}">Object detection</a>
-        </li>
-        <li>
-          <a href="{{ url_for('image_coord') }}">Image coordinates</a>
-        </li>
-      </ul>
-    </nav>
-    <aside>
+    <aside class="toast-wrapper">
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-          <ul class="flashes">
+          <ul>
           {% for category, message in messages %}
-            <li class="{{ category }}">
+            <li class="toast {{ category }}">
               {{ message }}
             </li>
           {% endfor %}
@@ -34,6 +21,21 @@
       {% endwith %}
     </aside>
     <main>
+      <header>
+        <nav>
+          <ul>
+            <li>
+              <a href="{{ url_for('image_class') }}">Image classification</a>
+            </li>
+            <li>
+              <a href="{{ url_for('object_det') }}">Object detection</a>
+            </li>
+            <li>
+              <a href="{{ url_for('image_coord') }}">Image coordinates</a>
+            </li>
+          </ul>
+        </nav>
+      </header>
       {% block body %}{% endblock %}
     </main>
   </body>

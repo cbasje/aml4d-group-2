@@ -34,6 +34,60 @@
   font-family: 'Fixel';
   font-weight: 400;
 }
+body {
+  margin: 0;
+  padding: 0;
+}
+
+aside.toast-wrapper {
+  width: 100%;
+}
+aside.toast-wrapper > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+aside.toast-wrapper li.toast {
+  padding: 1rem;
+  border: 1px solid rgba(0,0,0,0.3);
+}
+main {
+  padding: 1rem;
+}
+nav > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
 button, input, input[type="file"]::file-selector-button {
   font-family: inherit;
+}
+
+ul.image-grid {
+  ist-style: none;
+  margin: 0;
+  padding: 0;
+  
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+ul.image-grid > li {
+  width: 100%;
+}
+ul.image-grid img {
+  width: 100%;
+}
+
+table {
+  border-collapse: collapse;
+}
+table :is(th, td) {
+  padding-block: 0.25rem;
+  padding-inline: 0.5rem;
 }

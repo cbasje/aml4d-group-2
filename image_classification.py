@@ -27,6 +27,8 @@ def main():
 
   df.to_csv(os.path.join(OUTPUT_PATH, "image_classification.csv"), decimal=",")
 
+  return df.to_html()
+
 
 if __name__ == "__main__":
   main()
