@@ -1,17 +1,16 @@
 import os
 
-input_path = "data/input"
-output_path = "data/output"
+INPUT_PATH = "data/input"
 
 
 def readFile(file):
   print(f"Reading '{file}'")
-  with open(os.path.join(input_path, file), "rb") as f:
+  with open(os.path.join(INPUT_PATH, file), "rb") as f:
     data = f.read()
   return data
 
 
 def readInputFolder():
-  files = os.listdir(input_path)
-  print(f"{len(files)} files in '{input_path}'")
+  files = os.listdir(INPUT_PATH)
+  print(f"{len(files)} files in '{INPUT_PATH}'")
   return files

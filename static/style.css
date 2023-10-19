@@ -1,0 +1,39 @@
+@font-face {
+  font-family: 'Fixel';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(/static/FixelText-Light.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'Fixel';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/static/FixelText-Regular.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'Fixel';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/static/FixelText-Medium.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'Fixel';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/static/FixelText-Bold.woff2) format('woff2');
+}
+
+:root {
+  font-family: 'Fixel';
+  font-weight: 400;
+}
+button, input, input[type="file"]::file-selector-button {
+  font-family: inherit;
+}

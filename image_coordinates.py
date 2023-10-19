@@ -1,12 +1,11 @@
 import os
 import re
 from PIL import Image, ExifTags
-# from pillow_heif import register_heif_opener as registerHeifOpener
 from file import readFile, readInputFolder
 import pandas as pd
 
-input_path = "data/input"
-output_path = "data/output"
+INPUT_PATH = "data/input"
+OUTPUT_PATH = "data/output"
 
 
 # This function is inspired by: https://stackoverflow.com/questions/33997361/how-to-convert-degree-minute-second-to-degree-decimal
@@ -18,7 +17,7 @@ def parseCoord(tuple, direction):
 
 
 def getExif(file):
-  img = Image.open(os.path.join(input_path, file))
+  img = Image.open(os.path.join(INPUT_PATH, file))
   return img.getexif().get_ifd(ExifTags.IFD.GPSInfo)
 
 
@@ -38,10 +37,10 @@ def getGeotagging(file):
     return pd.Series({
         "file":
         file,
-        "lat":
+        "latitude":
         parseCoord(image_exif[ExifTags.GPS.GPSLatitude],
                    image_exif[ExifTags.GPS.GPSLatitudeRef]),
-        "lon":
+        "longitude":
         parseCoord(image_exif[ExifTags.GPS.GPSLongitude],
                    image_exif[ExifTags.GPS.GPSLongitudeRef])
     })
@@ -54,4 +53,8 @@ def main():
   df = pd.DataFrame([getGeotagging(file) for file in files])
   print(df)
 
-  df.to_csv(os.path.join(output_path, "image_coordinates.csv"), decimal=",")
+  df.to_csv(os.path.join(OUTPUT_PATH, "image_coordinates.csv"))
+
+
+if __name__ == "__main__":
+  main()

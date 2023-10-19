@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>AML4D Group Assignment 2</title>
+    <link href="/static/style.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <ul class="navigation">
+      <li>
+        <a href="/image-class">Image classification</a>
+      </li>
+      <li>
+        <a href="/object-det">Object detection</a>
+      </li>
+      <li>
+        <a href="/image-coord">Image coordinates</a>
+      </li>
+    </ul>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flashes">
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    {% block body %}{% endblock %}
+  </body>
+</html>

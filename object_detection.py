@@ -3,8 +3,8 @@ from PIL import Image, ImageDraw, ImageFont
 from api import API_OBJECT_DETECTION_URL, request
 from file import readFile, readInputFolder
 
-input_path = "data/input"
-output_path = "data/output"
+INPUT_PATH = "data/input"
+OUTPUT_PATH = "data/output"
 
 label_colors = {
     "bicycle": "orange",
@@ -15,11 +15,11 @@ label_colors = {
 
 
 def drawRectangles(file, data):
-  img = Image.open(os.path.join(input_path, file))
+  img = Image.open(os.path.join(INPUT_PATH, file))
   imgDraw = ImageDraw.Draw(img)
 
   fontHeight = 16
-  font = ImageFont.truetype('assets/FixelText-SemiBold.ttf', fontHeight)
+  font = ImageFont.truetype('static/FixelText-SemiBold.ttf', fontHeight)
 
   outlineWidth = 4
 
@@ -47,7 +47,7 @@ def drawRectangles(file, data):
                       outline=color,
                       width=outlineWidth)
 
-  img.save(os.path.join(output_path, file))
+  img.save(os.path.join(OUTPUT_PATH, file))
   print(f"'{file}' has {len(data)} objects")
 
 
@@ -57,3 +57,7 @@ def main():
     fileData = readFile(file)
     jsonData = request(API_OBJECT_DETECTION_URL, fileData)
     drawRectangles(file, jsonData)
+
+
+if __name__ == "__main__":
+  main()
