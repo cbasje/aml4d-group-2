@@ -1,6 +1,5 @@
 import os
 from PIL import Image, ImageDraw, ImageFont
-from pillow_heif import register_heif_opener
 from api import API_OBJECT_DETECTION_URL, request
 from file import readFile, readInputFolder
 
@@ -15,41 +14,8 @@ label_colors = {
 }
 
 
-def get_exif(file):
-  img = Image.open(os.path.join(input_path, file))
-  img.verify()
-  return img.getexif().get_ifd(0x8825)
-
-
-def get_geotagging(exif):
-  geo_tagging_info = {}
-  if not exif:
-    raise ValueError("No EXIF metadata found")
-  else:
-    gps_keys = [
-        'GPSVersionID', 'GPSLatitudeRef', 'GPSLatitude', 'GPSLongitudeRef',
-        'GPSLongitude', 'GPSAltitudeRef', 'GPSAltitude', 'GPSTimeStamp',
-        'GPSSatellites', 'GPSStatus', 'GPSMeasureMode', 'GPSDOP',
-        'GPSSpeedRef', 'GPSSpeed', 'GPSTrackRef', 'GPSTrack',
-        'GPSImgDirectionRef', 'GPSImgDirection', 'GPSMapDatum',
-        'GPSDestLatitudeRef', 'GPSDestLatitude', 'GPSDestLongitudeRef',
-        'GPSDestLongitude', 'GPSDestBearingRef', 'GPSDestBearing',
-        'GPSDestDistanceRef', 'GPSDestDistance', 'GPSProcessingMethod',
-        'GPSAreaInformation', 'GPSDateStamp', 'GPSDifferential'
-    ]
-
-    for k, v in exif.items():
-      try:
-        geo_tagging_info[gps_keys[k]] = str(v)
-      except IndexError:
-        pass
-    return geo_tagging_info
-
-
 def drawRectangles(file, data):
   img = Image.open(os.path.join(input_path, file))
-  img.verify()
-
   imgDraw = ImageDraw.Draw(img)
 
   fontHeight = 16
@@ -82,17 +48,12 @@ def drawRectangles(file, data):
                       width=outlineWidth)
 
   img.save(os.path.join(output_path, file))
+  print(f"'{file}' has {len(data)} objects")
 
 
 def main():
-  register_heif_opener()
-
   files = readInputFolder()
-  for file in files[:1]:
-    # fileData = readFile(file)
-    # jsonData = request(API_OBJECT_DETECTION_URL, fileData)
-
-    image_info = get_exif('IMG_2054.HEIC')
-    results = get_geotagging(image_info)
-    print(results)
-    # drawRectangles(file, jsonData)
+  for file in files:
+    fileData = readFile(file)
+    jsonData = request(API_OBJECT_DETECTION_URL, fileData)
+    drawRectangles(file, jsonData)
