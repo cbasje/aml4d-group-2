@@ -1,5 +1,5 @@
 import os
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageOps, ImageDraw, ImageFont
 from api import API_OBJECT_DETECTION_URL, request
 from file import readFile, readInputFolder
 
@@ -24,6 +24,7 @@ def drawRectangles(file, data):
   }
 
   img = Image.open(os.path.join(INPUT_PATH, file))
+  img = ImageOps.exif_transpose(img)
   imgDraw = ImageDraw.Draw(img)
 
   fontHeight = 16
@@ -32,7 +33,7 @@ def drawRectangles(file, data):
   outlineWidth = 4
 
   for i, obj in enumerate(data):
-    print(i, obj['label'])
+    # print(i, obj['label'])
 
     if obj['label'] in stats:
       stats[obj['label']] += 1
