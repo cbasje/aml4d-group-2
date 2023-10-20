@@ -1,7 +1,7 @@
 import os
 import re
 from PIL import Image, ExifTags
-from file import readFile, readInputFolder
+from file import read_file, read_folder
 import pandas as pd
 
 INPUT_PATH = "data/input"
@@ -47,7 +47,7 @@ def getGeotagging(file):
 
 
 def main():
-  files = readInputFolder()
+  files = read_folder(INPUT_PATH)
   df = pd.DataFrame([getGeotagging(file) for file in files])
   print(df)
 

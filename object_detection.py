@@ -1,7 +1,7 @@
 import os
 from PIL import Image, ImageOps, ImageDraw, ImageFont
 from api import API_OBJECT_DETECTION_URL, request
-from file import readFile, readInputFolder
+from file import read_file, read_folder
 
 INPUT_PATH = "data/input"
 OUTPUT_PATH = "data/output"
@@ -11,45 +11,45 @@ label_colors = {
     "car": "red",
     "truck": "red",
     "train": "blue",
-    "person": "purple"
+    "person": "purple",
+    "motorcycle": "blueviolet"
 }
 
 
 def drawRectangles(file, data):
-  stats = {
-      "bicycle": 0,
-      "car": 0,
-      "truck": 0,
-      "train": 0,
-  }
+  stats = {"bicycle": 0, "car": 0, "truck": 0, "train": 0, "motorcycle": 0}
 
   img = Image.open(os.path.join(INPUT_PATH, file))
+
+  # This fixes an issue with JPEG images: https://github.com/python-pillow/Pillow/issues/4703
   img = ImageOps.exif_transpose(img)
+
   imgDraw = ImageDraw.Draw(img)
 
-  fontHeight = 16
-  font = ImageFont.truetype('static/FixelText-SemiBold.ttf', fontHeight)
+  fontHeight = 8
+  font = ImageFont.truetype('static/FixelText-Bold.ttf', fontHeight)
 
   outlineWidth = 4
 
   for i, obj in enumerate(data):
-    # print(i, obj['label'])
+    # print(i, obj['label'], obj)
 
     if obj['label'] in stats:
       stats[obj['label']] += 1
 
     box = obj['box']
     color = label_colors.get(obj['label'], "black")
+    label = f"{obj['label']} ({round(obj['score'], 3)})"
 
-    labelLength = font.getlength(obj['label'])
+    labelLength = font.getlength(label)
     labelBgShape = [
         box['xmin'] + outlineWidth, box['ymin'],
         box['xmin'] + labelLength + (outlineWidth * 2),
-        box['ymin'] + fontHeight + outlineWidth
+        box['ymin'] + fontHeight + (outlineWidth * 2)
     ]
     imgDraw.rectangle(labelBgShape, fill=color, outline=None)
-    imgDraw.text((box['xmin'] + outlineWidth, box['ymin']),
-                 obj['label'],
+    imgDraw.text((box['xmin'] + outlineWidth, box['ymin'] + outlineWidth),
+                 label,
                  fill="white",
                  font=font)
 
@@ -67,12 +67,12 @@ def drawRectangles(file, data):
 
 def main():
   output = []
-  files = readInputFolder()
+  files = read_folder(INPUT_PATH)
   for file in files:
-    fileData = readFile(file)
+    fileData = read_file(file)
     jsonData = request(API_OBJECT_DETECTION_URL, fileData)
     stats = drawRectangles(file, jsonData)
-    output.append({"file": file, "stats": stats})
+    output.append({"file": file, "data": jsonData, "stats": stats})
 
   return output
 

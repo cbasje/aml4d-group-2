@@ -1,14 +1,14 @@
 import os
 import pandas as pd
 from api import API_IMAGE_CLASSIFICATION_URL, request
-from file import readFile, readInputFolder
+from file import read_file, read_folder
 
 INPUT_PATH = "data/input"
 OUTPUT_PATH = "data/output"
 
 
 def queryFile(file):
-  fileData = readFile(file)
+  fileData = read_file(file)
   return request(API_IMAGE_CLASSIFICATION_URL, fileData)
 
 
@@ -18,7 +18,7 @@ def valuesToRow(values, file):
 
 
 def main():
-  files = readInputFolder()
+  files = read_folder(INPUT_PATH)
   data = [queryFile(file) for file in files]
   print(data)
 

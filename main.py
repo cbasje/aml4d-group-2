@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 import object_detection
 import image_classification
 import image_coordinates
-from file import allowed_file
+from file import allowed_file, read_folder
 from PIL import Image, ExifTags
 
 # Inspired by: https://ask.replit.com/t/how-to-upload-files/14269/2
@@ -83,7 +83,7 @@ def upload():
       exif = None
       if 'exif' in img.info:
         exif = img.info['exif']
-          
+
       # Resize the uploaded images
       maxsize = 640
       if img.width > maxsize or img.height > maxsize:
@@ -92,29 +92,37 @@ def upload():
         else:
           factor = maxsize / img.width
         # factor = maxsize / img.width
-        img = img.resize((int(img.width * factor), int(img.height * factor)))
+        img = img.resize((int(img.width * factor), int(img.height * factor)),
+                         Image.LANCZOS)
 
       # Save the uploaded file to the UPLOAD_FOLDER directory
       filename = secure_filename(file.filename)
 
       if exif is not None:
-        img.save(os.path.join(app.config['UPLOAD_FOLDER'], filename), exif=exif)
+        img.save(os.path.join(app.config['UPLOAD_FOLDER'], filename),
+                 exif=exif)
       else:
         img.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-      flash(f"File {filename} uploaded successfully", "success")
+      flash(f"File '{filename}' uploaded successfully", "success")
     else:
       flash(f"Invalid file type for {file.filename}", "error")
   return redirect('/')
 
 
-@app.route('/output-files/<name>')
-def download_file(name):
-  return send_from_directory(OUTPUT_PATH, name)
+@app.route('/files/<string:folder>')
+@app.route('/files/<string:folder>/<string:name>')
+def get_files(folder, name=None):
+  path = f'data/{folder}'
+  if name is not None:
+    return send_from_directory(path, name)
+  else:
+    files = read_folder(path)
+    return render_template('files.html', folder=folder, files=files)
 
 
-app.add_url_rule("/output-files/<name>",
-                 endpoint="download_file",
+app.add_url_rule("/files/<folder>/<name>",
+                 endpoint="get_files",
                  build_only=True)
 
 app.run(host='0.0.0.0', port=81, debug=True)
