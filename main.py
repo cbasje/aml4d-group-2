@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 import object_detection
 import image_classification
 import image_coordinates
+from file import allowed_file
 
 # Inspired by: https://ask.replit.com/t/how-to-upload-files/14269/2
 app = Flask(__name__)
@@ -13,20 +14,11 @@ app.config['SECRET_KEY'] = os.urandom(12).hex()
 INPUT_PATH = "data/input"
 OUTPUT_PATH = "data/output"
 
-# Set the allowed file extensions
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-
 # Set the maximum file size (in bytes) that you want to allow
 MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB
 
 app.config['UPLOAD_FOLDER'] = INPUT_PATH
 app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
-
-
-# Define a function to check if the file extension is allowed
-def allowed_file(filename):
-  return '.' in filename and \
-         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @app.route('/')
@@ -82,9 +74,10 @@ def upload():
       return redirect('/')
 
     if file and allowed_file(file.filename):
+      filename = secure_filename(file.filename)
       # Save the uploaded file to the UPLOAD_FOLDER directory
-      file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
-      flash(f"File {file.filename} uploaded successfully", "success")
+      file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+      flash(f"File {filename} uploaded successfully", "success")
     else:
       flash(f"Invalid file type for {file.filename}", "error")
   return redirect('/')
