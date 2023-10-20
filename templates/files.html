@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h1>Files in '{{ folder }}'</h1>
+  <ul class="image-grid">
+    {% for f in files %}
+      <li>
+        <img src="/files/{{ folder }}/{{ f }}"/>
+        <h2>{{ f }}</h2>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}
