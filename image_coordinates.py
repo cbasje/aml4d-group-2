@@ -47,8 +47,6 @@ def getGeotagging(file):
 
 
 def main():
-  # registerHeifOpener()
-
   files = readInputFolder()
   df = pd.DataFrame([getGeotagging(file) for file in files])
   print(df)

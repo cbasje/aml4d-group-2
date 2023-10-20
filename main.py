@@ -1,10 +1,12 @@
 import os
+import io
 from flask import Flask, flash, request, redirect, url_for, send_from_directory, render_template
 from werkzeug.utils import secure_filename
 import object_detection
 import image_classification
 import image_coordinates
 from file import allowed_file
+from PIL import Image, ExifTags
 
 # Inspired by: https://ask.replit.com/t/how-to-upload-files/14269/2
 app = Flask(__name__)
@@ -74,9 +76,32 @@ def upload():
       return redirect('/')
 
     if file and allowed_file(file.filename):
-      filename = secure_filename(file.filename)
+      img = Image.open(file)
+      # img = ImageOps.exif_transpose(img)
+
+      # Get the metadata from the image
+      exif = None
+      if 'exif' in img.info:
+        exif = img.info['exif']
+          
+      # Resize the uploaded images
+      maxsize = 640
+      if img.width > maxsize or img.height > maxsize:
+        if img.height > img.width:
+          factor = maxsize / img.height
+        else:
+          factor = maxsize / img.width
+        # factor = maxsize / img.width
+        img = img.resize((int(img.width * factor), int(img.height * factor)))
+
       # Save the uploaded file to the UPLOAD_FOLDER directory
-      file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+      filename = secure_filename(file.filename)
+
+      if exif is not None:
+        img.save(os.path.join(app.config['UPLOAD_FOLDER'], filename), exif=exif)
+      else:
+        img.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
       flash(f"File {filename} uploaded successfully", "success")
     else:
       flash(f"Invalid file type for {file.filename}", "error")
