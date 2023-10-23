@@ -1,8 +1,16 @@
 import os
 
 INPUT_PATH = "data/input"
+OUTPUT_PATH = "data/output"
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
+
+# Check outersection of two lists
+def outersection(lst1, lst2):
+  temp = set(lst2)
+  lst3 = [value for value in lst1 if value not in temp]
+  print(lst3)
+  return lst3
 
 def read_file(file):
   print(f"Reading '{file}'")
@@ -14,6 +22,13 @@ def read_file(file):
 def read_folder(folder):
   files = os.listdir(folder)
   print(f"{len(files)} files in '{folder}'")
+  return files
+
+def get_unscanned_files():
+  input_files = os.listdir(INPUT_PATH)
+  output_files = os.listdir(OUTPUT_PATH)
+  files = outersection(input_files, output_files)
+  print(f"{len(files)} files unscanned")
   return files
 
 

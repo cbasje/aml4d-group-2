@@ -4,7 +4,7 @@
   <ul class="image-grid">
     {% for d in data %}
       <li>
-        <img src="/output-files/{{ d.file }}"/>
+        <img src="/files/output/{{ d.file }}"/>
         <h2>{{ d.file }}</h2>
         <ul>
           {% for k, v in d.stats.items() %}

@@ -1,7 +1,7 @@
 import os
 from PIL import Image, ImageOps, ImageDraw, ImageFont
 from api import API_OBJECT_DETECTION_URL, request
-from file import read_file, read_folder
+from file import read_file, read_folder, get_unscanned_files
 
 INPUT_PATH = "data/input"
 OUTPUT_PATH = "data/output"
@@ -16,21 +16,15 @@ label_colors = {
 }
 
 
-# Check outersection of two lists
-def outersection(lst1, lst2):
-  temp = set(lst2)
-  lst3 = [value for value in lst1 if value not in temp]
-  return lst3
-
-
 def draw_rectangles(file, data):
   stats = {"bicycle": 0, "car": 0, "truck": 0, "train": 0, "motorcycle": 0}
 
   img = Image.open(os.path.join(INPUT_PATH, file))
 
   # This fixes an issue with JPEG images: https://github.com/python-pillow/Pillow/issues/4703
-  img = ImageOps.exif_transpose(img)
-
+  if 'exif' in img.info:
+    img = ImageOps.exif_transpose(img)
+  
   imgDraw = ImageDraw.Draw(img)
 
   fontHeight = 8
@@ -74,9 +68,8 @@ def draw_rectangles(file, data):
 
 def main():
   output = []
-  input_files = read_folder(INPUT_PATH)
-  output_files = read_folder(OUTPUT_PATH)
-  for file in outersection(input_files, output_files):
+  files = get_unscanned_files()
+  for file in files:
     fileData = read_file(file)
     jsonData = request(API_OBJECT_DETECTION_URL, fileData)
     stats = draw_rectangles(file, jsonData)
