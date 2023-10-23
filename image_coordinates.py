@@ -3,6 +3,7 @@ import re
 from PIL import Image, ExifTags
 from file import read_file, read_folder
 import pandas as pd
+import object_detection
 
 INPUT_PATH = "data/input"
 OUTPUT_PATH = "data/output"
@@ -22,7 +23,7 @@ def getExif(file):
 
 
 # This function is inspired by the Pillow documentation: https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Exif
-def getGeotagging(file):
+def getGeotagging(file, stats={}):
   image_exif = getExif(file)
 
   if not image_exif:
@@ -42,13 +43,19 @@ def getGeotagging(file):
                    image_exif[ExifTags.GPS.GPSLatitudeRef]),
         "longitude":
         parseCoord(image_exif[ExifTags.GPS.GPSLongitude],
-                   image_exif[ExifTags.GPS.GPSLongitudeRef])
+                   image_exif[ExifTags.GPS.GPSLongitudeRef]),
+        **stats,
     })
 
 
-def main():
-  files = read_folder(INPUT_PATH)
-  df = pd.DataFrame([getGeotagging(file) for file in files])
+def main(include_stats=None):
+  if include_stats:
+    files = object_detection.main(read_folder(INPUT_PATH))
+    df = pd.DataFrame(
+        [getGeotagging(file=file.file, stats=file.stats) for file in files])
+  else:
+    files = read_folder(INPUT_PATH)
+    df = pd.DataFrame([getGeotagging(file) for file in files])
   print(df)
 
   df.to_csv(os.path.join(OUTPUT_PATH, "image_coordinates.csv"))

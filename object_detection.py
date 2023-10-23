@@ -24,7 +24,7 @@ def draw_rectangles(file, data):
   # This fixes an issue with JPEG images: https://github.com/python-pillow/Pillow/issues/4703
   if 'exif' in img.info:
     img = ImageOps.exif_transpose(img)
-  
+
   imgDraw = ImageDraw.Draw(img)
 
   fontHeight = 8
@@ -66,9 +66,8 @@ def draw_rectangles(file, data):
   return stats
 
 
-def main():
+def main(files=get_unscanned_files()):
   output = []
-  files = get_unscanned_files()
   for file in files:
     fileData = read_file(file)
     jsonData = request(API_OBJECT_DETECTION_URL, fileData)
