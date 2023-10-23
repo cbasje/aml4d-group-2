@@ -51,7 +51,9 @@ def object_det():
 @app.route('/image-coord')
 def image_coord():
   try:
-    table = image_coordinates.main()
+    include_stats = request.args.get("include_stats")
+    print(include_stats)
+    table = image_coordinates.main(include_stats)
     return render_template('image-coord.html', table=table)
   except:
     flash('Something went wrong!', "error")
