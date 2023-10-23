@@ -23,7 +23,7 @@ def outersection(lst1, lst2):
   return lst3
 
 
-def drawRectangles(file, data):
+def draw_rectangles(file, data):
   stats = {"bicycle": 0, "car": 0, "truck": 0, "train": 0, "motorcycle": 0}
 
   img = Image.open(os.path.join(INPUT_PATH, file))
@@ -79,7 +79,7 @@ def main():
   for file in outersection(input_files, output_files):
     fileData = read_file(file)
     jsonData = request(API_OBJECT_DETECTION_URL, fileData)
-    stats = drawRectangles(file, jsonData)
+    stats = draw_rectangles(file, jsonData)
     output.append({"file": file, "data": jsonData, "stats": stats})
 
   return output
