@@ -33,8 +33,9 @@ def image_class():
   try:
     table = image_classification.main()
     return render_template('image-class.html', table=table)
-  except:
+  except Exception as e:
     flash('Something went wrong!', "error")
+    print(e)
     return render_template('image-class.html')
 
 
@@ -43,20 +44,21 @@ def object_det():
   try:
     data = object_detection.main()
     return render_template('object-det.html', data=data)
-  except:
+  except Exception as e:
     flash('Something went wrong!', "error")
+    print(e)
     return render_template('object-det.html')
 
 
 @app.route('/image-coord')
 def image_coord():
   try:
-    include_stats = request.args.get("include_stats")
-    print(include_stats)
+    include_stats = request.args.get("include_stats", type=bool)
     table = image_coordinates.main(include_stats)
     return render_template('image-coord.html', table=table)
-  except:
+  except Exception as e:
     flash('Something went wrong!', "error")
+    print(e)
     return render_template('image-coord.html')
 
 
