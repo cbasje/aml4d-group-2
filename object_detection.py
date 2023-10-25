@@ -66,13 +66,19 @@ def draw_rectangles(file, data):
   return stats
 
 
-def main(files=get_unscanned_files()):
+def main(files):
   output = []
+  # files = read_folder(INPUT_PATH)
+  files = get_unscanned_files()
+
   for file in files:
     fileData = read_file(file)
     jsonData = request(API_OBJECT_DETECTION_URL, fileData)
     stats = draw_rectangles(file, jsonData)
     output.append({"file": file, "data": jsonData, "stats": stats})
+
+  # df = pd.DataFrame(output)
+  # df.to_csv(os.path.join(OUTPUT_PATH, 'obj_detect.csv'))
 
   return output
 

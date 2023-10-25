@@ -91,11 +91,7 @@ def upload():
       # Resize the uploaded images
       maxsize = 640
       if img.width > maxsize or img.height > maxsize:
-        if img.height > img.width:
-          factor = maxsize / img.height
-        else:
-          factor = maxsize / img.width
-        # factor = maxsize / img.width
+        factor = maxsize / img.height if img.height > img.width else maxsize / img.width
         img = img.resize((int(img.width * factor), int(img.height * factor)),
                          Image.LANCZOS)
 
@@ -114,6 +110,7 @@ def upload():
   return redirect('/')
 
 
+# Defines the endpoints to serve the files in the input and output directories
 @app.route('/files/<string:folder>')
 @app.route('/files/<string:folder>/<string:name>')
 def get_files(folder, name=None):
@@ -124,9 +121,5 @@ def get_files(folder, name=None):
     files = read_folder(path)
     return render_template('files.html', folder=folder, files=files)
 
-
-app.add_url_rule("/files/<folder>/<name>",
-                 endpoint="get_files",
-                 build_only=True)
 
 app.run(host='0.0.0.0', port=81, debug=True)
