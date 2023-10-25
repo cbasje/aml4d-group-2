@@ -2,14 +2,11 @@ import os
 import re
 import ast
 from PIL import Image, ExifTags
-from file import read_file, read_folder
+from file import INPUT_PATH, OUTPUT_PATH, read_folder
 import pandas as pd
-import object_detection
-
-INPUT_PATH = "data/input"
-OUTPUT_PATH = "data/output"
 
 
+# Parse the Minute/Second format of the coordinates into Decimal format
 # This function is inspired by: https://stackoverflow.com/questions/33997361/how-to-convert-degree-minute-second-to-degree-decimal
 def parse_coords(tuple, direction):
   coordString = f"""{tuple[0]}°{tuple[1]}'{tuple[2]}"{direction}"""
@@ -18,18 +15,22 @@ def parse_coords(tuple, direction):
           (60 * 60)) * (-1 if direction in ['W', 'S'] else 1)
 
 
+# Get the EXIF metadate for an image in INPUT_PATH
 def get_exif(file):
   img = Image.open(os.path.join(INPUT_PATH, file))
   return img.getexif().get_ifd(ExifTags.IFD.GPSInfo)
 
 
-# This function is inspired by the Pillow documentation: https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Exif
+# Get the geotagging information for an image
+# This function is inspired by the PIL/Pillow documentation: https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Exif
 def get_geotagging(file, stats={}):
+  # The statistics coming from the object_det.csv file is a <str>, so parse into a <dict>
   stats = ast.literal_eval(stats)
+  
   image_exif = get_exif(file)
 
   if not image_exif:
-    # raise ValueError("No EXIF metadata found")
+    # If there is no EXIF, continue to the next file
     print(f"'{file}' has no exif data.")
     return pd.Series({
         "file": file,
@@ -38,10 +39,11 @@ def get_geotagging(file, stats={}):
         **stats
     })
   else:
-    for key, val in image_exif.items():
-      if key in ExifTags.GPSTAGS:
-        print(f'{ExifTags.GPSTAGS[key]}:{val}')
+    # for key, val in image_exif.items():
+    #   if key in ExifTags.GPSTAGS:
+    #     print(f'{ExifTags.GPSTAGS[key]}:{val}')
 
+    # Create a new pandas Series for the file with the geotagging information (+ pre-existing statistics)
     return pd.Series({
         "file":
         file,
@@ -57,19 +59,21 @@ def get_geotagging(file, stats={}):
 
 def main(include_stats=False):
   if include_stats:
+    # If the object detection statistics should be included, read it from the obj_detect.csv file
     files = pd.read_csv(os.path.join(OUTPUT_PATH, 'obj_detect.csv'))
-    print(files)
     df = pd.DataFrame([
         get_geotagging(file['file'], file['stats'])
         for i, file in files.iterrows()
     ])
   else:
+    # If no statistics should be included, get files from INPUT_PATH
     files = read_folder(INPUT_PATH)
     df = pd.DataFrame([get_geotagging(file) for file in files])
-  print(df)
 
+  # Generate (and save) a CSV file from the Dataframe
   df.to_csv(os.path.join(OUTPUT_PATH, "image_coordinates.csv"))
 
+  # Generate an HTML table from the Dataframe
   return df.to_html()
 
 
