@@ -2,3 +2,4 @@ __pycache__
 .config
 .pythonlibs
 .upm
+yolov5s.pt

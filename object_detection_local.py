@@ -1,7 +1,11 @@
 import os
+import torch
+import pandas as pd
 from PIL import Image, ImageOps, ImageDraw, ImageFont
-from api import API_OBJECT_DETECTION_URL, request
-from file import INPUT_PATH, OUTPUT_PATH, read_file, get_unused_files
+from file import INPUT_PATH, OUTPUT_PATH, read_folder, get_unused_files
+
+# Model
+model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
 
 # Define the settings for bounding boxes
 fontHeight = 8
@@ -35,32 +39,31 @@ def draw_rectangles(file, data):
   # Create drawing object for the current image
   imgDraw = ImageDraw.Draw(img)
 
-  for i, obj in enumerate(data):
+  for i, obj in data.iterrows():
     # Track the statistics
-    if obj['label'] in stats:
-      stats[obj['label']] += 1
+    if obj['name'] in stats:
+      stats[obj['name']] += 1
 
-    box = obj['box']
-    color = label_colors.get(obj['label'], "black")
-    label = f"{obj['label']} ({round(obj['score'], 3)})"
+    color = label_colors.get(obj['name'], "black")
+    label = f"{obj['name']} ({round(obj['confidence'], 3)})"
 
     # Draw a box around/behind the label (+ score)
     labelLength = font.getlength(label)
     labelBgShape = [
-        box['xmin'] + outlineWidth, box['ymin'],
-        box['xmin'] + labelLength + (outlineWidth * 2),
-        box['ymin'] + fontHeight + (outlineWidth * 2)
+        obj['xmin'] + outlineWidth, obj['ymin'],
+        obj['xmin'] + labelLength + (outlineWidth * 2),
+        obj['ymin'] + fontHeight + (outlineWidth * 2)
     ]
     imgDraw.rectangle(labelBgShape, fill=color, outline=None)
 
     # Draw the label (+ score)
-    imgDraw.text((box['xmin'] + outlineWidth, box['ymin'] + outlineWidth),
+    imgDraw.text((obj['xmin'] + outlineWidth, obj['ymin'] + outlineWidth),
                  label,
                  fill="white",
                  font=font)
 
     # Draw the bounding box
-    outlineShape = [box['xmin'], box['ymin'], box['xmax'], box['ymax']]
+    outlineShape = [obj['xmin'], obj['ymin'], obj['xmax'], obj['ymax']]
     imgDraw.rectangle(outlineShape,
                       fill=None,
                       outline=color,
@@ -76,15 +79,15 @@ def draw_rectangles(file, data):
 
 def main():
   output = []
-  # files = read_folder(INPUT_PATH)
-  files = get_unused_files()
+  files = read_folder(INPUT_PATH)
+#   files = get_unused_files()
 
   # Get the data from the Hugging Face API for each file and draw the bounding boxes
   for file in files:
-    fileData = read_file(file)
-    jsonData = request(API_OBJECT_DETECTION_URL, fileData)
-    stats = draw_rectangles(file, jsonData)
-    output.append({"file": file, "data": jsonData, "stats": stats})
+    print(f"Reading '{file}'")
+    results = model([os.path.join(INPUT_PATH, file)])
+    stats = draw_rectangles(file, results.pandas().xyxy[0])
+    output.append({"file": file, "data": results.pandas().xyxy, "stats": stats})
 
   # Generate (and save) a CSV file from the Dataframe
   # df = pd.DataFrame(output)
