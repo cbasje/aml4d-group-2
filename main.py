@@ -44,7 +44,9 @@ def image_class():
 @app.route('/object-det')
 def object_det():
   try:
-    data = object_detection.main()
+    # Check if calculation should be redone
+    redo = request.args.get("redo", type=bool)
+    data = object_detection.main(redo)
     return render_template('object-det.html', data=data)
   except Exception as e:
     flash('Something went wrong!', "error")

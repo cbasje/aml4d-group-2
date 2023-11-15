@@ -12,6 +12,10 @@ pillow-heif = "^0.13.1"
 flask = "^3.0.0"
 werkzeug = "^3.0.0"
 utils = "^1.0.1"
+pillow = "^10.1.0"
+tensorflow-object-detection-api = "^0.1.1"
+xintool = "^0.0.7"
+api = "^0.0.7"
 
 [tool.pyright]
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md

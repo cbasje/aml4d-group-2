@@ -89,6 +89,13 @@ nav > ul {
     gap: 1rem;
 }
 
+header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
 button,
 input,
 input[type="file"]::file-selector-button {
@@ -135,6 +142,17 @@ ul.image-grid > li {
 }
 ul.image-grid img {
     width: 100%;
+}
+ul.image-grid .image-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+ul.image-grid .image-header h2 {
+    min-width: 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 table {

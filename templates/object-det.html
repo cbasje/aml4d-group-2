@@ -1,11 +1,17 @@
 {% extends "layout.html" %}
 {% block body %}
-  <h1>Dectect objects in the images</h1>
+  <header>
+    <h1>Dectect objects in the images</h1>
+    <a href="?redo=true">↻ Redo detection</a>
+  </header>
   <ul class="image-grid">
     {% for d in data %}
       <li>
-        <img src="/files/output/{{ d.file }}"/>
-        <h2>{{ d.file }}</h2>
+        <img src="/files/output/{{ d.file }}" loading="lazy" />
+        <div class="image-header">
+          <h2>{{ d.file }}</h2>
+          <a href="/files/output/{{ d.file }}" title="Download file" download>⬇️</a>
+        </div>
         <ul>
           {% for k, v in d.stats.items() %}
             <li>

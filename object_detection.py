@@ -1,7 +1,9 @@
 import os
+import pandas as pd
 from PIL import Image, ImageOps, ImageDraw, ImageFont
 from api import API_OBJECT_DETECTION_URL, request
-from file import INPUT_PATH, OUTPUT_PATH, read_file, get_unused_files
+from file import INPUT_PATH, OUTPUT_PATH, read_file, read_folder, get_unused_files
+import ast
 
 # Define the settings for bounding boxes
 fontHeight = 8
@@ -76,25 +78,33 @@ def draw_rectangles(file, data):
   return stats
 
 
-def main():
-  output = []
-  # files = read_folder(INPUT_PATH)
-  files = get_unused_files()
+def main(redo=False):
+  if redo:
+    output = []
+    files = read_folder(INPUT_PATH)
+    # files = get_unused_files()
 
-  # Get the data from the Hugging Face API for each file and draw the bounding boxes
-  for file in files:
-    fileData = read_file(file)
-    jsonData = request(API_OBJECT_DETECTION_URL, fileData)
-    stats = draw_rectangles(file, jsonData)
-    output.append({"file": file, "data": jsonData, "stats": stats})
+    # Get the data from the Hugging Face API for each file and draw the bounding boxes
+    for file in files:
+      fileData = read_file(file)
+      jsonData = request(API_OBJECT_DETECTION_URL, fileData)
+      stats = draw_rectangles(file, jsonData)
+      output.append({"file": file, "data": jsonData, "stats": stats})
 
-  # Generate (and save) a CSV file from the Dataframe
-  # df = pd.DataFrame(output)
-  # df.to_csv(os.path.join(OUTPUT_PATH, 'obj_detect.csv'))
+    # Generate (and save) a CSV file from the Dataframe
+    # df = pd.DataFrame(output)
+    # df.to_csv(os.path.join(OUTPUT_PATH, 'obj_detect.csv'))
+  else:
+    df = pd.read_csv(os.path.join(OUTPUT_PATH, 'obj_detect.csv'))
+    output = [{
+        "file": row.get('file'),
+        "data": ast.literal_eval(row.get('data')),
+        "stats": ast.literal_eval(row.get('stats'))
+    } for row in df.to_dict('records')]
 
   # Output the data to use in the HTML page
   return output
 
 
 if __name__ == "__main__":
-  main()
+  main(True)
