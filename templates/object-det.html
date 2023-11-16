@@ -9,8 +9,13 @@
       <li>
         <img src="/files/output/{{ d.file }}" loading="lazy" />
         <div class="image-header">
-          <h2>{{ d.file }}</h2>
           <a href="/files/output/{{ d.file }}" title="Download file" download>⬇️</a>
+          <h2>{{ d.file }}</h2>
+          {% if '-local' in d.file %}
+          <span class="badge">
+            LOCAL
+          </span>
+          {% endif %}
         </div>
         <ul>
           {% for k, v in d.stats.items() %}
